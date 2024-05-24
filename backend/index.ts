@@ -4,11 +4,15 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 
 const app = express();
-app.use(cors({ origin: "http://localhost:5173" }));
+const isDev = app.settings.env === "development";
+const url = isDev
+  ? "http://localhost:3000"
+  : "https://real-time-white-board-application.netlify.app";
+app.use(cors({ origin: url }));
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: url,
     methods: ["GET", "POST"],
   },
 });
