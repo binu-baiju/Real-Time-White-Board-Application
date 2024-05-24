@@ -1,7 +1,7 @@
-import express from "express";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import cors from "cors";
+const express = require("express");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const cors = require("cors");
 
 const app = express();
 app.use(cors({ origin: "http://localhost:5173" }));
@@ -16,10 +16,10 @@ let roomIdGlobal: string;
 let beginPathData: any;
 let drawLineData: any;
 let changeConfigData: any;
-io.on("connection", (socket) => {
+io.on("connection", (socket: any) => {
   console.log("server connected");
 
-  socket.on("userJoined", (data) => {
+  socket.on("userJoined", (data: any) => {
     const { userName, userId, roomId, host, presenter } = data;
     roomIdGlobal = roomId;
     console.log(roomId);
@@ -41,17 +41,17 @@ io.on("connection", (socket) => {
     // socket.broadcast.emit("beginPath", arg);
   });
 
-  socket.on("beginPath", (arg) => {
+  socket.on("beginPath", (arg: any) => {
     beginPathData = arg;
     socket.broadcast.to(roomIdGlobal).emit("beginPath", arg);
   });
 
-  socket.on("drawLine", (arg) => {
+  socket.on("drawLine", (arg: any) => {
     drawLineData = arg;
     socket.broadcast.to(roomIdGlobal).emit("drawLine", arg);
   });
 
-  socket.on("changeConfig", (arg) => {
+  socket.on("changeConfig", (arg: any) => {
     changeConfigData = arg;
     socket.broadcast.to(roomIdGlobal).emit("changeConfig", arg);
   });
