@@ -41,7 +41,7 @@ const url = isDev
   ? "http://localhost:5173"
   : "https://real-time-white-board-application.netlify.app";
 console.log(url);
-app.use(cors({ origin: url, credentials: true }));
+app.use(cors({ origin: [url, "http://localhost:5173"], credentials: true }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api", savingDrawingRoutes);
