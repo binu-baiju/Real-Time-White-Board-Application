@@ -15,7 +15,9 @@ const VerifyEmail = () => {
 
       try {
         const result = await axios.get(
-          `http://localhost:5000/api/verify-email/${verificationCode}`,
+          // `http://localhost:5000/api/verify-email/${verificationCode}`,
+          `https://real-time-white-board-application.onrender.com/api/verify-email/${verificationCode}`,
+
           {
             // headers: { Authorization: token },
           }

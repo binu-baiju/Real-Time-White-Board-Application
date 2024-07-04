@@ -49,7 +49,9 @@ export function ForgotPassword() {
       console.log("hello");
 
       const response = await axios.post(
-        "http://localhost:5000/api/sendforgotpasswordemail",
+        // "http://localhost:5000/api/sendforgotpasswordemail",
+        "https://real-time-white-board-application.onrender.com/api/sendforgotpasswordemail",
+
         data,
         { withCredentials: true }
       );

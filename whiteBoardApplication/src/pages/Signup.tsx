@@ -40,7 +40,9 @@ export default function Signup() {
     try {
       setServerError(null);
       const response = await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        // "http://localhost:5000/api/auth/signup",
+        "https://real-time-white-board-application.onrender.com/api/auth/signup",
+
         data,
         { withCredentials: true }
       );

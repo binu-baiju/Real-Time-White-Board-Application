@@ -150,7 +150,9 @@ const Board = () => {
       const token = Cookies.get("token");
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/getDrawing",
+          // "http://localhost:5000/api/getDrawing",
+          "https://real-time-white-board-application.onrender.com/api/getDrawing",
+
           {
             headers: { Authorization: token },
           }
@@ -200,7 +202,9 @@ const Board = () => {
 
           try {
             const response = await axios.post(
-              "http://localhost:5000/api/saveDrawing",
+              // "http://localhost:5000/api/saveDrawing",
+              "https://real-time-white-board-application.onrender.com/api/saveDrawing",
+
               {
                 drawing: dataURL,
                 // drawingHistory: drawHistory,

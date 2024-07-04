@@ -46,7 +46,9 @@ const ResetPassword = () => {
       console.log("hello hai");
 
       const response = await axios.post(
-        "http://localhost:5000/api/resetpassword",
+        // "http://localhost:5000/api/resetpassword",
+        "https://real-time-white-board-application.onrender.com/api/resetpassword",
+
         { password, token }
       );
       console.log("response Data:", response);
