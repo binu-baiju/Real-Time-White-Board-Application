@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { MENU_ITEMS } from "../constants";
+import { MenuState } from "../types/stateTypes";
 
 const initialState = {
   activeMenuItem: MENU_ITEMS.PENCIL,

@@ -5,6 +5,7 @@ import { RootState } from "../store";
 import { ReactEventHandler } from "react";
 import { menuItemClick } from "../slice/menuSlice";
 import socket from "../socket";
+// import Home from "./Dialog";
 
 function Toolbox() {
   const dispatch = useDispatch();
@@ -31,6 +32,8 @@ function Toolbox() {
       id="toolboxContainer"
       className="p-5 absolute top-1/4 left-5 lg:w-64 md:w-48 rounded-md border solid border-[#475569]"
     >
+      {/* <Home /> */}
+
       <div id="toolboxItem" className="mb-5">
         <h4 id="toolboxText" className="text-xs">
           Stroke Color

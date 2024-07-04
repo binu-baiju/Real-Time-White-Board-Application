@@ -3,11 +3,16 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MENU_ITEMS } from "../constants";
 import { actionItemClick } from "../slice/menuSlice";
+import { useLocation } from "react-router-dom";
 
 import socket from "../socket";
+import axios from "axios";
+import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 const Board = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const shouldDraw = useRef(false);
@@ -36,17 +41,24 @@ const Board = () => {
     } else if (
       actionMenuItem === MENU_ITEMS.UNDO ||
       actionMenuItem === MENU_ITEMS.REDO
-    ) {
-      if (historyPointer.current > 0 && actionMenuItem === MENU_ITEMS.UNDO)
-        historyPointer.current -= 1;
-      if (
-        historyPointer.current < drawHistory.current.length - 1 &&
-        actionMenuItem === MENU_ITEMS.REDO
-      )
-        historyPointer.current += 1;
-      const imageData = drawHistory.current[historyPointer.current];
-      context.putImageData(imageData, 0, 0);
-    }
+    )
+      if (drawHistory.current.length > 0) {
+        if (historyPointer.current > 0 && actionMenuItem === MENU_ITEMS.UNDO)
+          historyPointer.current -= 1;
+        if (
+          historyPointer.current < drawHistory.current.length - 1 &&
+          actionMenuItem === MENU_ITEMS.REDO
+        )
+          historyPointer.current += 1;
+        const imageData = drawHistory.current[historyPointer.current];
+        context.putImageData(imageData, 0, 0);
+      } else {
+        if (actionMenuItem === MENU_ITEMS.UNDO) {
+          toast.error("Cant do undo");
+        } else if (actionMenuItem === MENU_ITEMS.REDO) {
+          toast.error("Cant do redo");
+        }
+      }
 
     dispatch(actionItemClick(null));
   }, [actionMenuItem, dispatch]);
@@ -108,12 +120,14 @@ const Board = () => {
     };
 
     const handleMouseUp = () => {
-      console.log("mouseDown");
+      console.log("mouseUP");
 
       shouldDraw.current = false;
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
       drawHistory.current.push(imageData);
       historyPointer.current = drawHistory.current.length - 1;
+      console.log("drwa history:", drawHistory);
+      console.log("drwa history pointer:", historyPointer);
     };
 
     const handleBeginPath = (path: { x: number; y: number }) => {
@@ -130,6 +144,36 @@ const Board = () => {
 
     socket.on("beginPath", handleBeginPath);
     socket.on("drawLine", handleDrawLine);
+    console.log("location:", location.pathname);
+
+    const fetchDrawing = async () => {
+      const token = Cookies.get("token");
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/getDrawing",
+          {
+            headers: { Authorization: token },
+          }
+        );
+        if (response.data.drawing) {
+          const img = new Image();
+          img.onload = () => {
+            context.drawImage(img, 0, 0);
+          };
+          img.src = response.data.drawing;
+        }
+        // if (response.data.drawingHistory) {
+        //   console.log("hostroy from backend:", response.data.drawingHistory);
+
+        //   drawHistory.current = response.data.drawingHistory;
+        // }
+        console.log("Drawing history:", drawHistory.current);
+      } catch (error) {
+        console.error("Error fetching drawing:", error);
+      }
+    };
+
+    fetchDrawing();
 
     return () => {
       canvas.removeEventListener("mousedown", handleMouseDown);
@@ -140,6 +184,46 @@ const Board = () => {
       socket.off("drawLine", handleDrawLine);
     };
   }, []);
+
+  useEffect(() => {
+    const token = Cookies.get("token");
+
+    const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+
+      console.log("Before Unload");
+      if (location.pathname === "/") {
+        if (canvasRef.current) {
+          const canvas = canvasRef.current;
+          const dataURL = canvas.toDataURL();
+          console.log("Saving drawing:", dataURL); // Add this log
+
+          try {
+            const response = await axios.post(
+              "http://localhost:5000/api/saveDrawing",
+              {
+                drawing: dataURL,
+                // drawingHistory: drawHistory,
+                token: token,
+              }
+            );
+            console.log("Drawing saved:", response.data); // Add this log
+          } catch (error) {
+            console.error("Error saving drawing:", error); // Add this log
+          }
+        }
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload, {
+      capture: true,
+    });
+
+    return () => {
+      window.removeEventListener("unload", handleBeforeUnload);
+    };
+  }, [location.pathname]);
 
   return <canvas ref={canvasRef}></canvas>;
 };
