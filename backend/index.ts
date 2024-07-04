@@ -2,13 +2,54 @@ const express = require("express");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const bodyParser = require("body-parser");
+import dotenv from "dotenv";
+
+import authRoutes from "./routes/auth";
+import savingDrawingRoutes from "./routes/savingDrawing";
+import getDrawingRoutes from "./routes/getDrawing";
+import verifyEmailRoutes from "./routes/verifyEmail";
+import sendForgotPasswordEmail from "./routes/sendForgotPasswordEmail";
+import resetPassword from "./routes/resetPassword";
+
+dotenv.config();
+
+const MongoDB_URI = process.env.MONGODB_URI;
+
+const mongoose = require("mongoose");
+
+mongoose.connect(MongoDB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+// Check connection status
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", function () {
+  console.log("Connected to MongoDB");
+});
 
 const app = express();
+
+// app.use(express.json());
+app.use(bodyParser.json({ limit: "50mb" }));
+
 const isDev = app.settings.env === "development";
+console.log(isDev);
 const url = isDev
-  ? "http://localhost:3000"
+  ? "http://localhost:5173"
   : "https://real-time-white-board-application.netlify.app";
-app.use(cors({ origin: url }));
+console.log(url);
+app.use(cors({ origin: url, credentials: true }));
+
+app.use("/api/auth", authRoutes);
+app.use("/api", savingDrawingRoutes);
+app.use("/api", getDrawingRoutes);
+app.use("/api", verifyEmailRoutes);
+app.use("/api", sendForgotPasswordEmail);
+app.use("/api", resetPassword);
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
