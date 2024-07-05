@@ -4,6 +4,7 @@ import { menuItemClick, actionItemClick } from "../slice/menuSlice";
 import { MENU_ITEMS } from "../constants";
 import { RootState } from "../store";
 import { Button } from "./ui/button";
+import socket from "../socket";
 // import ShareDialog from "./Dialog";
 function Menu() {
   const dispatch = useDispatch();
@@ -12,6 +13,7 @@ function Menu() {
   );
   const handleMenuClick = (itemName: string) => {
     dispatch(menuItemClick(itemName));
+    socket.emit("menuItemClick", itemName);
   };
 
   const handleActioItemClick = (itemName: string) => {

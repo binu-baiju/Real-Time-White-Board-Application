@@ -2,7 +2,7 @@ import { RootState } from "../store";
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MENU_ITEMS } from "../constants";
-import { actionItemClick } from "../slice/menuSlice";
+import { actionItemClick, menuItemClick } from "../slice/menuSlice";
 import { useLocation } from "react-router-dom";
 
 import socket from "../socket";
@@ -41,17 +41,36 @@ const Board = () => {
     } else if (
       actionMenuItem === MENU_ITEMS.UNDO ||
       actionMenuItem === MENU_ITEMS.REDO
-    )
+    ) {
       if (drawHistory.current.length > 0) {
-        if (historyPointer.current > 0 && actionMenuItem === MENU_ITEMS.UNDO)
+        if (historyPointer.current > 0 && actionMenuItem === MENU_ITEMS.UNDO) {
           historyPointer.current -= 1;
+        }
         if (
           historyPointer.current < drawHistory.current.length - 1 &&
           actionMenuItem === MENU_ITEMS.REDO
-        )
+        ) {
           historyPointer.current += 1;
+        }
         const imageData = drawHistory.current[historyPointer.current];
         context.putImageData(imageData, 0, 0);
+        console.log("redo or undo presse");
+        // const tempCanvas = document.createElement("canvas");
+        // const tempContext = canvas.getContext("2d");
+        // tempCanvas.width = imageData.width;
+        // tempCanvas.height = imageData.height;
+        // if (tempContext) {
+        // tempContext.putImageData(imageData, 0, 0);
+        // const imageDataURL = tempCanvas.toDataURL();
+        if (canvasRef.current) {
+          const canvas = canvasRef.current;
+          const dataURL = canvas.toDataURL();
+
+          // Emit the Data URL to the socket
+          socket.emit("undoorredoaction", dataURL);
+          // }
+          console.log("redo or undo presse 2");
+        }
       } else {
         if (actionMenuItem === MENU_ITEMS.UNDO) {
           toast.error("Cant do undo");
@@ -59,6 +78,7 @@ const Board = () => {
           toast.error("Cant do redo");
         }
       }
+    }
 
     dispatch(actionItemClick(null));
   }, [actionMenuItem, dispatch]);
@@ -144,6 +164,7 @@ const Board = () => {
 
     socket.on("beginPath", handleBeginPath);
     socket.on("drawLine", handleDrawLine);
+
     console.log("location:", location.pathname);
 
     const fetchDrawing = async () => {
@@ -228,6 +249,41 @@ const Board = () => {
       window.removeEventListener("unload", handleBeforeUnload);
     };
   }, [location.pathname]);
+
+  useEffect(() => {
+    socket.on("menuItemClick", (itemName: string) => {
+      dispatch(menuItemClick(itemName));
+    });
+
+    return () => {
+      socket.off("menuItemClick");
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    socket.on("undoorredoaction", (imageDataURL: any) => {
+      console.log("reached redo and undo", imageDataURL.data);
+
+      const img = new Image();
+      img.onload = () => {
+        context.clearRect(0, 0, canvas.width, canvas.height); // Clear existing content
+        context.drawImage(img, 0, 0); // Draw the image onto the canvas
+      };
+      img.onerror = (error) => {
+        console.error("Error loading image:", error);
+      };
+      img.src = imageDataURL;
+    });
+
+    return () => {
+      socket.off("undoorredoaction");
+    };
+  }, []);
 
   return <canvas ref={canvasRef}></canvas>;
 };

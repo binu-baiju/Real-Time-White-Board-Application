@@ -80,7 +80,7 @@ export default function ShareDialog() {
       >
         <Button
           variant="outline"
-          className="bg-[#6b67dc] flex justify-center items-center h-10"
+          className="bg-[#6b67dc] hover:bg-[#5e5adb] flex justify-center items-center h-10"
         >
           <Share2 className="block lg:hidden" color="#ffffff" />
           <span className="hidden lg:block text-white">Share</span>
