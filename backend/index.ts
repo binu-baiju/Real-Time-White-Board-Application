@@ -61,6 +61,9 @@ let roomIdGlobal: string;
 let beginPathData: any;
 let drawLineData: any;
 let changeConfigData: any;
+let menuItemData: any;
+let imageDataInServer: any;
+
 io.on("connection", (socket: any) => {
   console.log("server connected");
 
@@ -84,6 +87,15 @@ io.on("connection", (socket: any) => {
       socket.emit("changeConfig", changeConfigData);
     }
     // socket.broadcast.emit("beginPath", arg);
+    if (menuItemData) {
+      socket.emit("menuItemClick", menuItemData);
+    }
+
+    if (imageDataInServer) {
+      console.log("reciecved undo redo 2");
+
+      socket.emit("undoorredoaction", imageDataInServer);
+    }
   });
 
   socket.on("beginPath", (arg: any) => {
@@ -99,6 +111,17 @@ io.on("connection", (socket: any) => {
   socket.on("changeConfig", (arg: any) => {
     changeConfigData = arg;
     socket.broadcast.to(roomIdGlobal).emit("changeConfig", arg);
+  });
+
+  socket.on("menuItemClick", (arg: any) => {
+    menuItemData = arg;
+    socket.broadcast.to(roomIdGlobal).emit("menuItemClick", arg);
+  });
+
+  socket.on("undoorredoaction", (imageDataURL: any) => {
+    console.log("reciecved undo redo 1");
+    imageDataInServer = imageDataURL;
+    socket.broadcast.to(roomIdGlobal).emit("undoorredoaction", imageDataURL);
   });
 });
 
