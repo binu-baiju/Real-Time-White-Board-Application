@@ -72,11 +72,17 @@ io.on("connection", (socket: any) => {
     roomIdGlobal = roomId;
     console.log(roomId);
     socket.join(roomId);
+    console.log(
+      "Users in room:",
+      Array.from(io.sockets.adapter.rooms.get(roomId) || [])
+    );
+    console.log(`User ${socket.id} joined room ${roomId}`);
     socket.emit("userIsJoined", {
       success: true,
       roomIdNumber: roomId,
       host: host,
     });
+
     if (beginPathData) {
       socket.emit("beginPath", beginPathData);
     }
@@ -114,7 +120,12 @@ io.on("connection", (socket: any) => {
   });
 
   socket.on("menuItemClick", (arg: any) => {
+    console.log("menuitem in backend", arg);
+
     menuItemData = arg;
+    console.log(
+      `Broadcasting menuItemClick to room ${roomIdGlobal},user:${socket.id}`
+    );
     socket.broadcast.to(roomIdGlobal).emit("menuItemClick", arg);
   });
 
