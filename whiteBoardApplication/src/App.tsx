@@ -58,9 +58,10 @@ function App() {
       <Routes>
         {/* <Route path="/:roomId" element={<WhiteBoard />}></Route>
         <Route path="/" element={<WhiteBoard />}></Route> */}
+        <Route path="/:roomId" element={<WhiteBoard />} />
+
         <Route path="/" element={<ProtectedRoute />}>
           <Route path="/" element={<WhiteBoard />} />
-          <Route path="/:roomId" element={<WhiteBoard />} />
         </Route>
         <Route
           path="/forms"

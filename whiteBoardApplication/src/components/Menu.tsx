@@ -12,6 +12,7 @@ function Menu() {
     (state: RootState) => state.menu.activeMenuItem
   );
   const handleMenuClick = (itemName: string) => {
+    console.log("called hello hello menu ", itemName);
     dispatch(menuItemClick(itemName));
     socket.emit("menuItemClick", itemName);
   };

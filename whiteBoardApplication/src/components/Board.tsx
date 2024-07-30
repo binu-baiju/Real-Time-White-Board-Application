@@ -252,6 +252,8 @@ const Board = () => {
 
   useEffect(() => {
     socket.on("menuItemClick", (itemName: string) => {
+      console.log("menuitemClick called", itemName);
+
       dispatch(menuItemClick(itemName));
     });
 

@@ -114,7 +114,7 @@ export default function ShareDialog() {
             Generate
           </Button>
           <CopyToClipboard
-            text={roomId}
+            text={`${window.location.origin}/${roomId}`}
             onCopy={() => {
               notifyCopy();
               handleCreateSubmit();

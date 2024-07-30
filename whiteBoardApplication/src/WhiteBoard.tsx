@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Board from "./components/Board";
 import ShareDialog from "./components/Dialog.tsx";
 import Menu from "./components/Menu";
@@ -12,6 +12,7 @@ import Cookies from "js-cookie";
 
 const WhiteBoard = (user: User) => {
   const { roomId } = useParams();
+  const [isSender, setIsSender] = useState<boolean>(false);
   console.log(roomId);
   const token = Cookies.get("token");
   console.log("token:", token);
@@ -26,15 +27,21 @@ const WhiteBoard = (user: User) => {
         presenter: false,
       };
       socket.emit("userJoined", roomData);
+
+      socket.on("userJoined", (data: any) => {
+        if (data.host) {
+          setIsSender(true);
+        }
+      });
     }
-  }, [roomId]);
+  }, [roomId, user.userName]);
 
   console.log("user:", user);
   return (
     <div className="">
       <div className="overflow-y-hidden lg:overflow-x-hidden">
-        <Menu />
-        <Toolbox />
+        {isSender && <Menu />}
+        {isSender && <Toolbox />}
         <ShareDialog />
         <Board />
       </div>
