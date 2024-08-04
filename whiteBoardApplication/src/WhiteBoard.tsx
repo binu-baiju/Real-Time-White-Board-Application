@@ -32,6 +32,7 @@ const WhiteBoard = (user: User) => {
       socket.on("userJoined", (data: any) => {
         if (data.host) {
           setIsSender(true);
+          setIsRealTime(true);
         }
       });
     } else {
