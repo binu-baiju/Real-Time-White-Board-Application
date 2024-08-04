@@ -13,6 +13,7 @@ import Cookies from "js-cookie";
 const WhiteBoard = (user: User) => {
   const { roomId } = useParams();
   const [isSender, setIsSender] = useState<boolean>(false);
+  const [isRealTime, setIsRealTime] = useState<boolean>(!!roomId);
   console.log(roomId);
   const token = Cookies.get("token");
   console.log("token:", token);
@@ -33,15 +34,22 @@ const WhiteBoard = (user: User) => {
           setIsSender(true);
         }
       });
+    } else {
+      // Single-user mode
+      setIsRealTime(false);
     }
   }, [roomId, user.userName]);
 
   console.log("user:", user);
+  console.log("user:", isRealTime);
+  console.log("user:", isSender);
+
   return (
     <div className="">
       <div className="overflow-y-hidden lg:overflow-x-hidden">
-        {isSender && <Menu />}
-        {isSender && <Toolbox />}
+        <div></div>
+        {(!isRealTime || isSender) && <Menu />}
+        {(!isRealTime || isSender) && <Toolbox />}
         <ShareDialog />
         <Board />
       </div>
