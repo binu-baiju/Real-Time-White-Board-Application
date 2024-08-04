@@ -88,7 +88,7 @@ export default function ShareDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Share link</DialogTitle>
+          <DialogTitle>Share Live Collaboration link</DialogTitle>
           {/* <DialogDescription>Link</DialogDescription> */}
         </DialogHeader>
         <div className="flex items-center space-x-2">
